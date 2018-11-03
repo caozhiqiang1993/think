@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="INDEX_PUBLIC_CSS/main.css">
+</head>
+<body>
+    <div class="loginPage" ref="loginPage">
+
+        <div class="L_enter">
+            <p class="l_same_P">
+                <input type="text" placeholder="用户名" v-model="username">
+            </p>
+            <p class="l_same_P">
+                <input type="password" placeholder="密码" v-model="userpsd">
+            </p>
+            <div class="loginBtn" @click="loginSubmit">
+                LOGIN
+            </div>
+            <div class="rORf">
+                <span><router-link to="/registe">REGISTER HERE</router-link></span>
+                <span><router-link to="/forget">FORGET PASSWORD</router-link></span>
+            </div>
+            <p class="l_same_P l_same_OR">
+                <span class="span_or">OR</span>
+            </p>
+        </div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="INDEX_PUBLIC_JS/jquery.min.js"></script>
+<script>
+
+
+    //创建ajax函数
+
+    var addActivity = new Vue({
+        el:'.loginPage',
+        data:{
+            username: '',
+            userpsd: '',
+            ws:{}
+        },
+        props: [],
+        methods: {
+            loginSubmit:function() {
+                $.ajax({
+                    type:"POST",
+                    url:"",
+                    dataTpty:'json',
+                    data:{'username':this.username,userpsd:this.userpsd},
+                    error: function() {
+//                window.location.reload();
+                    },
+                    success: function(result){
+                        if (result.code==0) {
+//                            this.storage.set('key',msg.body.data.key)
+                            window.open('/index','_self');
+                        }else{
+                            this.$messagebox.alert(msg.body.msg, 'error');
+                        }
+                    }
+                });
+            }
+        },
+        mounted:function () {
+
+        }
+    })
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped lang="css">
+    .loginPage{
+        min-height: calc(100vh + 1px);
+        background: #0094da;
+        padding: 0 2rem;
+    }
+
+    .L_enter input::-webkit-input-placeholder{
+        color:#fff;
+    }
+
+    .L_enter input::-moz-placeholder{   /* Mozilla Firefox 19+ */
+        color:#fff;
+    }
+
+    .L_enter input:-moz-placeholder{    /* Mozilla Firefox 4 to 18 */
+        color:#fff;
+    }
+
+    .L_enter input:-ms-input-placeholder{  /* Internet Explorer 10-11 */
+        color:#fff;
+    }
+
+    .L_enter .l_same_P{
+        padding: 0.8rem 0 0.4rem;
+        border-bottom:0.2rem solid #007ec5;
+    }
+
+    .L_enter .l_same_P	input{
+        background:#0094da;
+        width:100%;
+        font-size:0.75rem;
+        color: white;
+        outline: none;
+    }
+
+    .L_enter .l_same_OR{
+        text-align:center;
+        color:#fff;
+        padding-top:0.5rem;
+    }
+
+
+
+
+    .loginBtn{
+        text-align: center;
+        color: #555;
+        padding: 0.4rem;
+        margin-top: 0.4rem;
+        background: #fff;
+        font-size: 0.65rem;
+        box-shadow: 0 0 1px 1px #ababab;
+    }
+
+    .rORf{
+        padding:0.8rem 0 0.4rem;
+        color: #fff;
+    }
+    .rORf span:last-child{
+        float:right;
+    }
+    .rORf span{
+        font-size:0.5rem;
+    }
+
+    .l_third{
+        text-align:center;
+    }
+
+
+    .l_third img{
+        width: 1.6rem;
+        margin: 0.7rem;
+    }
+
+</style>
+</body>
+</html>

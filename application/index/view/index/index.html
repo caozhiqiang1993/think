@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0,viewport-fit=cover" />
+    <link rel="stylesheet" href="https://at.alicdn.com/t/font_746239_sfcfjc4mgbf.css">
+    <link rel="stylesheet" href="INDEX_PUBLIC_CSS/main.css">
+    <link rel="stylesheet" href="INDEX_PUBLIC_CSS/message.css">
+    <link rel="stylesheet" href="INDEX_PUBLIC_CSS/findUser.css">
+    <link rel="stylesheet" href="INDEX_PUBLIC_CSS/userInfo.css">
+    <link rel="stylesheet" href="INDEX_PUBLIC_CSS/user.css">
+    <title>我的IM</title>
+  </head>
+  <body>
+    <div class="hello">
+    <div id="header">
+      <p>
+        <span>
+          {{title}}
+        </span>
+      </p>
+    </div>
+    <div style="height: 2.2rem;"></div>
+
+    <div id="content">
+      <!-- 聊天记录列表start -->
+      <div id="chat_log" v-show="contentIndex == 0">
+        <ul>
+            <li v-for="item,key in userAllMsg" @click="handleRouter(key)">
+              <div class="img_box">
+                <span><img :src="friendsList[key].img"></span>
+              </div>
+              <div class="info_box">
+                <span v-text="friendsList[key].user_name"></span>
+                <p v-text="item.length > 0 ? item[item.length - 1].msg : ''"></p>
+              </div>
+            </li>
+        </ul>
+      </div>
+      <!-- 聊天记录列表end -->
+
+      <!-- 好友列表start -->
+      <div id="friends" v-show="contentIndex == 1">
+        <ul class="friends_h">
+          <template v-for="item,index in friendsHeader">
+            <li v-if="index == 0" @click="appayList()">
+              <div class="fh_img 2">
+                <i :class="item.iconName"></i>
+              </div>
+              <div class="fh_text">
+                <span v-text="item.text"></span>
+              </div>
+            </li>
+            <li v-else>
+              <div class="fh_img">
+                <i :class="item.iconName"></i>
+              </div>
+              <div class="fh_text">
+                <span v-text="item.text"></span>
+              </div>
+            </li>
+
+          </template>
+        </ul>
+
+        <ul class="friends_f">
+          <li v-for="item,index in groupingFriendList">
+            <h5 @click="item.show = !item.show">
+              <i class="iconfont icon-htbarrowright02" :class="{rotate90 : item.show}"></i>
+              <span v-text="item.name"></span>
+              <em>
+                (<span v-text="item.num"></span>)
+              </em>
+            </h5>
+            <ul class="friends_info" v-show="item.show">
+              <template v-for="user,key in item.users">
+                <li v-show="user.user_id != user_id" @click="checkUserInfo(user,2)">
+                  <div class="friends_img_box">
+                    <span><img :src="user.img"></span>
+                  </div>
+                  <div class="friends_info_box">
+                    <span v-text="user.user_name"></span>
+                    <p v-text="user.explain"></p>
+                  </div>
+                </li>
+              </template>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <!-- 好友列表end -->
+
+      <!-- 更多start -->
+      <div id="more" v-show="contentIndex == 2">
+        <ul>
+          <template v-for="item,key in more">
+            <li v-if="key == 0" @click="userLeft == 100 ?userLeft=0:userLeft=100">
+              <div class="more_img">
+                <i :class="item.icon"></i>
+              </div>
+              <div class="more_text">
+                <span v-text="item.name"></span>
+              </div>
+            </li>
+            <li v-else>
+              <div class="more_img">
+                <i :class="item.icon"></i>
+              </div>
+              <div class="more_text">
+                <span v-text="item.name"></span>
+              </div>
+            </li>
+          </template>
+        </ul>
+      </div>
+      <!-- 更多end -->
+      <div style="height: 2.2rem;"></div>
+    </div>
+
+
+
+
+    <div id="footer">
+      <ul>
+        <li v-for="(item,index) in footerInfo" @click="contentIndex = index" :class="{active : contentIndex == index}">
+          <p><i :class="[item.iconName,{reversal : index == 0}]" class="icon"></i></p>
+          <span v-text="item.text"></span>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+    </div>
+
+      <!--聊天start-->
+      <div id="message" v-bind:style="{ left: left + '%' }">
+        <div id="msg_header" ref="header">
+          <div class="header_img">
+            <i class="iconfont icon-left" @click="left == 0 ? left =100 : left =0"></i>
+          </div>
+          <div class="header_text">
+            <span v-text="msgTitle.user_name"></span>
+          </div>
+        </div>
+        <div id="msg_content">
+          <div class="msg_info" ref="msg_info" @click="isShowEmoji=0">
+            <ul>
+              <li v-for="(item,index) in userMsg" class="" v-bind:class="{ 'msg_info_li_right': user_id == item.user_id}">
+                <div class="msg_user_info" class="" v-bind:class="{ 'msg_user_info_right': user_id == item.user_id}">
+                  <img :src="friendsList[item.user_id].img">
+                  <span v-text="friendsList[item.user_id].user_name" class="" v-bind:class="{ 'msg_user_info_text_right': user_id == item.user_id}"></span>
+                </div>
+                <div class="msg_msg" class="" v-bind:class="{ 'msg_msg_right': user_id == item.user_id}">
+                  <p v-text="item.msg"></p>
+                </div>
+              </li>
+              <!--<li class="interval_time">
+                <span>07-07 14:28</span>
+              </li>-->
+
+            </ul>
+          </div>
+          <div class="input_box">
+            <div class="input_text">
+              <input type="text" v-model="Message" id="send_message">
+              <button v-if="Message != ''" @click="senMessage()" class="botton_color">发送</button>
+              <button v-else>发送</button>
+            </div>
+            <div class="more_function">
+              <span class="iconfont icon-smile biaoqing" @click="isShowEmoji=!isShowEmoji"></span>
+              <span class="iconfont icon-tupian"></span>
+              <span class="iconfont icon-iconset0196"></span>
+            </div>
+            <div id="biaoqing" v-show="isShowEmoji">
+              <table>
+                <tr v-for="item,key in emoji">
+                  <td v-for="val,index in item" v-text="val" @click.stop="addEmoji(key,index)"></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--聊天end-->
+
+      <!--查找好友start-->
+      <div id="findUser" v-bind:style="{ left: findUserLeft + '%' }">
+        <div class="findUserHeader">
+          <i class="iconfont icon-left" @click="findUserLeft==0?findUserLeft=100:findUserLeft=0"></i>
+          <span>添加好友</span>
+        </div>
+        <div class="findUserButton">
+          <i></i><input type="text" placeholder="用户名" v-model="findUserText"><span @click="findUser()">搜索</span>
+        </div>
+        <div class="applyTest">
+          <span>新的好友</span>
+        </div>
+        <div class="applyList">
+          <ul>
+            <li v-for="item in findApplyList.list" @click="checkUserInfo(item,2)">
+              <div class="img_box">
+                <span><img :src="item.img"></span>
+              </div>
+              <div class="info_box">
+                <span v-text="item.user_name"></span>
+                <p v-text="item.memo"></p>
+              </div>
+              <div class="info_botton">
+                <span v-if="item.status == 0" @click.stop="applyDeal(item,1)" class="botton_color">接受</span>
+                <span v-else-if="item.status == 1">已接受</span>
+                <span v-else-if="item.status == 2">已拒绝</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!--查找好友end-->
+
+      <!--好友信息start-->
+      <div id="userInfo" v-bind:style="{ left: userInfoLeft + '%' }">
+        <div class="userInfoHeader">
+          <i class="iconfont icon-left" @click="userInfoLeft==0?userInfoLeft=100:userInfoLeft=0"></i>
+          <span>好友资料</span>
+        </div>
+        <div class="userImgName">
+          <div class="floarLeft userInfoImg">
+            <img :src="findUserInfo.img">
+          </div>
+          <div class="floarLeft userInfoName">
+            <p v-text="findUserInfo.user_name"></p>
+          </div>
+        </div>
+        <div class="addUser">
+          <template v-if="findUserInfo.type == 1">
+            <div class="addUserButton" @click="addApply()">
+              添加好友
+            </div>
+          </template>
+          <template v-else-if="findUserInfo.type == 2">
+            <template v-if="findUserInfo.status == 0">
+              <div class="addUserButton" @click="applyDeal(findUserInfo,1)">
+                通过申请
+              </div>
+              <div class="addUserButton rejectButton" @click="applyDeal(findUserInfo,2)">
+                拒绝申请
+              </div>
+            </template>
+            <template v-else>
+              <div class="addUserButton" @click="handleRouter(findUserInfo.user_id);">
+                发消息
+              </div>
+            </template>
+          </template>
+
+        </div>
+      </div>
+      <!--好友信息end-->
+
+      <!--个人信息start-->
+      <div id="user" v-bind:style="{ left: userLeft + '%' }">
+        <div class="userInfoHeader">
+          <i class="iconfont icon-left" @click="userLeft==0?userLeft=100:userLeft=0"></i>
+          <span>个人信息</span>
+        </div>
+        <div class="userContent">
+          <div class="userInfoButtonBox">
+            <ul>
+              <li>
+                <div class="floarLeft">
+                  <span>头像</span>
+                </div>
+                <div class="floarRight">
+                  <img :src="friendsList[user_id].img" alt="">
+                  <input type="file" name="img" class="touxiang" @change="uploadImg(event)">
+                </div>
+              </li>
+              <li>
+                <div class="floarLeft">
+                  <span>用户名</span>
+                </div>
+                <div class="floarRight">
+                  <p v-text="friendsList[user_id].user_name">test</p>
+                </div>
+              </li>
+              <li>
+                <div class="floarLeft">
+                  <span>个人说明</span>
+                </div>
+                <div class="floarRight">
+                  <p><input type="text" :value="friendsList[user_id].explain" v-model="friendsList[user_id].explain" @blur="editUserInfo()"></p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+      <!--个人信息end-->
+
+
+  </div>
+  </body>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="INDEX_PUBLIC_JS/jquery.min.js"></script>
+<script src="INDEX_PUBLIC_JS/third/layer/layer.js"></script>
+<script src="INDEX_PUBLIC_JS/socket.js"></script>
+<script src="INDEX_PUBLIC_JS/storage.js"></script>
+<!--<script src="INDEX_PUBLIC_JS/data.js"></script>-->
+  <script>
+    var emoji = '😀 😁 😂 😃 😄 😅 😆 😉 😊 😋 😎 😍 😘 😗 😙 😚 😇 😐 😑 😶 😏 😣 😥 😮 😯 😪 😫 😴 😌 😛 😜 😝 😒 😓 😔 😕 😲 😷 😖 😞 😟 😤 😢 😭 😦 😧 😨 😬 😰 😱 😳 😵 😡 😠';
+    emoji_arr = emoji.split(' ');
+    var emoji_data = {}
+    var start = end = 0;
+    var row = 10;
+    for(var i=1;i<=5;i++){
+        start = (i-1)*row
+        end = row*i
+        emoji_data[i] = emoji_arr.slice(start,end);
+    }
+    var dataInfo = {
+        msg: 'Welcome to Your Vue.js App',
+        title: '我的IM',
+        contentIndex: 0,
+        user_id: {$user_id},
+        user_name: '{$user_name}',
+        left: 100, //聊天left
+        findUserLeft: 100,  //查找好友left
+        userInfoLeft: 100,  //好友信息left
+        userLeft: 100,  //个人信息left
+        findUserInfo: {},  //查找好友的信息
+        findApplyList: {
+            wCount:2,
+            list:[
+                /*{
+                    id:'1',
+                    user_name:'张三',
+                    img:'http://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg',
+                    memo:'嗨，欢迎体验LayIM。演示标记：1530843285035',
+                    status:0
+                }*/
+            ]
+        },  //查找好友的信息
+        msgTitle: {}, //当前聊天的用户
+        Message:'',
+        findUserText:'',
+        userMsg:[], //当前聊天界面的记录
+        userAllMsg:{
+            /*'1-2':[
+                {
+                    user_id:1,
+                    user_name:'张三',
+                    img:'http://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg',
+                    msg:'嗨，欢迎体验LayIM。演示标记：1530843285035'
+                }
+            ]*/
+        }, //用户所有的聊天记录
+        footerInfo:[
+            {
+                text:'消息',
+                iconName:'iconfont icon-cc-message'
+            },
+            {
+                text:'联系人',
+                iconName:'iconfont icon-user'
+            },
+            {
+                text:'更多',
+                iconName:'iconfont icon-more'
+            }
+        ],
+        friendsHeader:[
+            {
+                text:'新的朋友',
+                iconName:'iconfont icon-plus'
+            },
+            {
+                text:'群聊',
+                iconName:'iconfont icon-users'
+            }
+        ],
+        friendsList:{}, //好友列表
+        groupingList:[], //分组信息
+        groupingFriendList:[
+            /*{
+                id:1,
+                name:'知名人物',
+                show:false,
+                num:'5',
+                users:[
+                    {
+                        user_id:1,
+                        img:'http://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg',
+                        user_name:'张三',
+                        autograph:'这些都是测试数据，实际使用请严格按照该格式返回'
+                    },
+                    {
+                        user_id:2,
+                        img:'http://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg',
+                        user_name:'张三',
+                        autograph:'这些都是测试数据，实际使用请严格按照该格式返回'
+                    },
+                ]
+            },
+            {
+                id:2,
+                name:'知名人物2',
+                show:false,
+                num:'5',
+                users:[
+                    {
+                        user_id:3,
+                        img:'http://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg',
+                        user_name:'张三',
+                        autograph:'这些都是测试数据，实际使用请严格按照该格式返回'
+                    },
+                    {
+                        user_id:4,
+                        img:'http://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg',
+                        user_name:'张三',
+                        autograph:'这些都是测试数据，实际使用请严格按照该格式返回'
+                    },
+                ]
+            },
+            {
+                id:3,
+                name:'知名人物3',
+                show:false,
+                num:'5',
+                users:[
+                    {
+                        user_id:5,
+                        img:'http://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg',
+                        user_name:'张三',
+                        autograph:'这些都是测试数据，实际使用请严格按照该格式返回'
+                    },
+                    {
+                        user_id:6,
+                        img:'http://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg',
+                        user_name:'张三',
+                        autograph:'这些都是测试数据，实际使用请严格按照该格式返回'
+                    },
+                ]
+            },*/
+        ], //分组好友信息
+        more:[
+            {
+                icon:'iconfont icon-shezhi',
+                name:'设置'
+            },
+            {
+                icon:'iconfont icon-find',
+                name:'分享'
+            },
+            {
+                icon:'iconfont icon-iconset0103',
+                name:'关于'
+            },
+        ],
+        websock:null,
+        emoji:emoji_data,
+        isShowEmoji:0
+    }
+
+
+var addActivity = new Vue({
+  el: '.hello',
+  data : dataInfo,
+  methods:{
+    addEmoji:function (key,index) {
+      this.Message = this.Message+this.emoji[key][index]
+        this.isShowEmoji = 0
+    },
+    editUserInfo:function () {
+      var formData = {};
+      formData.explain = this.friendsList[this.user_id].explain;
+      console.log(formData)
+      var msg = layer.load(2, {time: 10*1000}); //又换了种风格，并且设定最长等待10秒
+      $.ajax({
+          url: "/index/user/editUserInfo",
+          type: "post",
+          data: formData,
+          success: function(data) {
+              layer.close(msg)
+              if(data.status == 0){
+//                  _this.friendsList[_this.user_id].img = data.data
+              }else{
+                  layer.msg('修改失败');
+              }
+          }
+      });
+    }, //修改个人信息
+    uploadImg:function (e) {
+        var _this = this
+        var fils = e.target.files["0"];
+        if (fils.length == 0) return false
+        var i_image = new Image();
+        i_image.src = window.URL.createObjectURL(fils)
+        i_image.onload = function () {
+            var fordate = new FormData();
+            fordate.append('img', fils);
+            var msg = layer.load(2, {time: 10*1000}); //又换了种风格，并且设定最长等待10秒
+            $.ajax({
+                url: "/index/user/uploadImg",
+                type: "post",
+                data: fordate,
+                processData: false,
+                contentType: false,
+                success: function(data) {
+                    layer.close(msg)
+                    if(data.status == 0){
+                        _this.friendsList[_this.user_id].img = data.data
+                    }else{
+                        layer.msg('上传失败');
+                    }
+                }
+            });
+        }
+    }, //上传头像
+    dealGroupingFriend:function () {
+        var data =[]
+      for(var i in this.groupingList){
+          data[i] = this.groupingList[i]
+          data[i].show = false
+          data[i].users = []
+          for(var j in this.friendsList){
+              if(this.groupingList[i].id == this.friendsList[j].grouping && this.friendsList[j].id != this.user_id){
+                  data[i].users.push(this.friendsList[j])
+              }
+          }
+          data[i].num = data[i].users.length -1
+      }
+        this.groupingFriendList = data
+    }, //处理分组好友
+    userFriend:function () {
+        var _this = this
+        $.ajax({
+            type:"POST",
+            url:"/index/friend/getFriend",
+            data:{},
+            error: function() {
+//                window.location.reload();
+            },
+            success: function(result){
+                if(result.status == 0){
+                    for(var i=0;i<result.data.grouping.length;i++){
+                        result.data.grouping[i].show = false
+                    }
+                    _this.friendsList = result.data.friend
+                    _this.groupingList = result.data.grouping
+                    _this.dealGroupingFriend()
+                }
+            }
+        });
+    },//获取分组和好友
+    checkUserInfo:function (user,type) {
+        console.log(user)
+        this.findUserInfo=user
+        this.findUserInfo.type = type
+        this.userInfoLeft = 0
+    },//查看用户
+    applyDeal:function (item,type) {
+        var msg = layer.load(2, {time: 10*1000}); //又换了种风格，并且设定最长等待10秒
+        $.ajax({
+            type:"POST",
+            url:"/index/apply/applyDeal",
+            data:{id:item.id,type:type},
+            error: function() {
+//                window.location.reload();
+            },
+            success: function(result){
+                layer.close(msg);
+                if(result.status == 0){
+                    item.status = type
+                    layer.msg('添加成功')
+                }else if(result.status == 1000){
+                    item.status = 1
+                    layer.msg('已经是好友啦')
+                }else{
+                    layer.msg('添加失败')
+                }
+            }
+        });
+    },//好友申请处理
+    appayList:function () {
+      var _this = this
+      if(this.findUserLeft == 100){
+          this.findUserLeft = 0
+          var msg = layer.load(2, {time: 10*1000}); //又换了种风格，并且设定最长等待10秒
+          $.ajax({
+              type:"POST",
+              url:"/index/apply/applyList",
+              data:{},
+              error: function() {
+//                window.location.reload();
+              },
+              success: function(result){
+                  layer.close(msg);
+                  if(result.status == 0){
+                      _this.findApplyList.wCount = result.data.w_count;
+                      _this.findApplyList.list = result.data.list;
+                  }else{
+                      layer.msg('添加失败')
+                  }
+              }
+          });
+      }else{
+          this.findUserLeft = 100
+      }
+    },//好友申请列表
+    addApply:function () {
+        var _this = this
+        var msg = layer.load(2, {time: 10*1000}); //又换了种风格，并且设定最长等待10秒
+        $.ajax({
+            type:"POST",
+            url:"/index/apply/addApply",
+            data:{'f_user_id':_this.findUserInfo.id},
+            error: function() {
+//                window.location.reload();
+            },
+            success: function(result){
+                layer.close(msg);
+                if(result.status == 0){
+                    layer.msg('申请成功')
+                    _this.userInfoLeft = 100
+                }else{
+                    layer.msg('申请失败')
+                }
+            }
+        });
+    },//申请添加好友
+    findUser:function () {
+        var _this = this
+        var msg = layer.load(2, {time: 10*1000}); //又换了种风格，并且设定最长等待10秒
+        $.ajax({
+            type:"POST",
+            url:"/index/user/getUserInfo",
+            data:{'username':this.findUserText},
+            error: function() {
+//                window.location.reload();
+            },
+            success: function(result){
+                _this.findUserText = ''
+                layer.close(msg);
+                if(result.status == 0){
+                    _this.checkUserInfo(result.data,1)
+                }else{
+                    layer.msg('没有该用户')
+                }
+            }
+        });
+    },//好友信息
+    handleRouter:function(f_user_id){
+        var _this = this
+        this.left = 0
+        this.msgTitle.user_id = f_user_id
+        this.msgTitle.user_name = this.friendsList[f_user_id].user_name
+        if(this.userAllMsg[f_user_id] != undefined){
+            this.userMsg = this.userAllMsg[f_user_id]
+        }else{
+            this.userMsg = []
+        }
+        setTimeout(function () {
+            _this.findUserLeft=_this.userInfoLeft=100;_this.contentIndex=0;
+        },300)
+    }, //聊天界面
+    threadPoxi:function(){  // 实际调用的方法
+
+        const agentData = "mymessage";//参数
+        //若是ws开启状态
+        if (this.socket.ws.readyState !== this.socket.ws.OPEN) {
+            // this.websocketsend(agentData)
+            console.log("已开启")
+        }
+        // 若是 正在开启状态，则等待300毫秒
+        else if (this.socket.ws.readyState === this.socket.ws.CONNECTING) {
+            let that = this.socket.ws;//保存当前对象this
+            setTimeout(function () {
+                // that.websocketsend(agentData)
+                console.log("发送")
+            }, 300);
+        }
+        // 若未开启 ，则等待500毫秒
+        else {
+            this.socket.connectSocket;
+            let that = this.socket.ws;//保存当前对象this
+            setTimeout(function () {
+                // that.websocketsend(agentData)
+                console.log("发送2")
+            }, 500);
+        }
+    },
+    senMessage:function () {
+        var data = '{"type":"msg","info":"'+this.Message+'","fuid":'+this.msgTitle.user_id+',"uid":'+this.user_id+'}';
+        this.socket.ws.send(data);
+        var msg = {
+            user_id:this.user_id,
+            f_user_id:this.msgTitle.user_id,
+            user_name:this.user_name,
+            img:'http://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg',
+            msg:this.Message
+        }
+        if(this.userAllMsg[this.msgTitle.user_id] == undefined){
+            this.userAllMsg[this.msgTitle.user_id] = []
+            this.userMsg = this.userAllMsg[this.msgTitle.user_id]
+        }
+        this.userAllMsg[this.msgTitle.user_id].push(msg)
+        this.Message = ''
+    },//发送消息
+  },
+  mounted:function() {
+
+  },
+  created:function () {
+//      this.dealGroupingFriend()  //处理好友分组数据
+      console.log(this)
+      this.socket = socket
+      this.storage = storage
+      this.socket.connectSocket(this)
+        this.userFriend() //获取好友
+  },
+  beforeCreate:function () {
+  },
+  watch: {  //监听
+      userMsg() {
+          this.$nextTick(() => {
+              var container = this.$el.querySelector("#message .msg_info");
+              container.scrollTop = container.scrollHeight;
+          })
+      }
+  }
+
+})
+</script>
+
+</html>

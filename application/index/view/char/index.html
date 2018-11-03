@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<style>
+    .hello{
+        height: 100%;
+        position: relative;
+        background: #eee;
+    }
+    .reversal{
+        transform: scaleX(-1);
+        display: inline-block;
+    }
+    .rotate90{
+        transform: rotate(90deg);
+    }
+    #header{
+        width: 100%;
+        height: 2.2rem;
+        line-height: 2.2rem;
+        background: #36373C;
+        position: fixed;
+        top:0;
+        z-index: 1;
+    }
+    #header p{
+        /*margin-left: 0.5rem;*/
+        text-align: center;
+    }
+    #header p span{
+        color:#fff;
+        font-size: 0.8rem;
+    }
+    #chat_log{
+        background: rgb(0,0,0,.1);
+    }
+    #chat_log ul{
+        background: #fff;
+    }
+    #chat_log ul li{
+        height: 2.5rem;
+        border-bottom: 1px solid #f2f2f2;
+    }
+    .img_box{
+        height: 100%;
+        line-height: 100%;
+        display: inline-block;
+        margin:0 0.5rem;
+    }
+    #chat_log .img_box span{
+        display: flex;
+        height: 100%;
+        width: 1.5rem;
+        align-items: center;
+    }
+    .info_box{
+        display: inline-block;
+        height: 100%;
+        vertical-align: top;
+        margin-top: 0.3rem;
+
+    }
+    .info_box span{
+        font-size: 0.8rem;
+    }
+    .info_box p{
+        margin-top: 0.1rem;
+        color: #999;
+    }
+    #chat_log ul li img,.friends_info li img{
+        width: 1.5rem;
+        height: 1.5rem;
+        border-radius: 50%;
+    }
+
+    #footer{
+        width: 100%;
+        height: 2.2rem;
+        background: #fff;
+        position: fixed;
+        bottom: 0;
+    }
+    #footer ul li{
+        width: 33%;
+        text-align: center;
+        float: left;
+        color: #666;
+    }
+    #footer ul li i{
+        font-size: 1.1rem;
+
+    }
+    #footer ul li.active{
+        color: #3FDD86;
+    }
+    #friends ul{
+        background: #fff;
+    }
+    #friends>ul>li{
+        border-bottom: 1px solid #f2f2f2;
+    }
+    #friends ul li,#more ul li{
+        height: 2.1rem;
+        line-height: 2.1rem;
+    }
+    #friends .fh_img{
+        position: absolute;
+    }
+    #friends .fh_text{
+        margin-left: 1.9rem;
+    }
+    #friends ul li i{
+        font-size: 1rem;
+    }
+    .friends_h li i{
+        color: #36373C;
+        margin:0 0.5rem;
+
+    }
+    #friends ul li span{
+        font-size: 0.7rem;
+    }
+    .friends_f {
+        margin-top: 0.5rem;
+    }
+    .friends_f > li{
+        height: auto !important;
+    }
+    .friends_f li i{
+        color: #C9BDBB;
+        margin-left:0.7rem;
+        margin-right:0.4rem;
+    }
+    .friends_f li h5{
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+    }
+    .friends_f li h5 em{
+        font-style: normal;
+        padding-left: 0.3rem;
+        color: #999;
+        font-size: 0.7rem;
+    }
+    .friends_info li{
+        border-top: 1px solid #f2f2f2;
+        line-height: normal !important;
+    }
+    .friends_img_box{
+        display: inline-block;
+        height: 100%;
+        width: 1.5rem;
+        margin:0 0.5rem;
+    }
+    .friends_img_box span{
+        display: flex;
+        align-items: center;
+        height: 100%;
+    }
+    .friends_info_box{
+        display: inline-block;
+    }
+    .friends_info_box p{
+        color:#999;
+    }
+    #friends .friends_info_box span{
+        font-size: 0.8rem;
+    }
+    #more ul li{
+        height: 2.1rem;
+        background: #fff;
+        border-bottom: 1px solid #f2f2f2;
+    }
+    #more .more_img{
+        position: absolute;
+        left: 0.5rem;
+    }
+    #more .more_img i{
+        font-size: 1rem;
+
+    }
+    #more .more_text{
+        margin-left: 1.9rem;
+    }
+    #more .more_text span{
+        font-size: 0.7rem;
+    }
+</style>
+<body>
+<div class="hello">
+    <div id="header">
+        <p>
+        <span>
+          {{title}}
+        </span>
+        </p>
+    </div>
+    <div style="height: 2.2rem;"></div>
+    <div id="content">
+        <!-- 聊天记录 -->
+        <div id="chat_log" v-show="contentIndex == 0">
+            <ul>
+                <li v-for="item in msgInfo" @click="handleRouter('msg?name='+item.name)">
+                    <div class="img_box">
+                        <span><img :src="item.img"></span>
+                    </div>
+                    <div class="info_box">
+                        <span v-text="item.name"></span>
+                        <p v-text="item.msg">嗨，欢迎体验LayIM。演示标记：1530843285035</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 好友列表 -->
+        <div id="friends" v-show="contentIndex == 1">
+            <ul class="friends_h">
+                <li v-for="item in friendsHeader">
+                    <div class="fh_img">
+                        <i :class="item.iconName"></i>
+                    </div>
+                    <div class="fh_text">
+                        <span v-text="item.text"></span>
+                    </div>
+                </li>
+            </ul>
+
+            <ul class="friends_f">
+                <li v-for="item,index in friendsList">
+                    <h5 @click="item.show = !item.show">
+                        <i class="ion-ios-arrow-right" :class="{rotate90 : item.show}"></i>
+                        <span v-text="item.cateName"></span>
+                        <em>
+                            (<span v-text="item.num"></span>)
+                        </em>
+                    </h5>
+                    <ul class="friends_info" v-show="item.show">
+                        <li v-for="list,key in item.list" @click="handleRouter('msg?name='+list.name)">
+                            <div class="friends_img_box">
+                                <span><img :src="list.img"></span>
+                            </div>
+                            <div class="friends_info_box">
+                                <span v-text="list.name"></span>
+                                <p v-text="list.autograph"></p>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 更多 -->
+        <div id="more" v-show="contentIndex == 2">
+            <ul>
+                <li v-for="item in more">
+                    <div class="more_img">
+                        <i :class="item.icon"></i>
+                    </div>
+                    <div class="more_text">
+                        <span v-text="item.name">关于</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div style="height: 2.2rem;"></div>
+    </div>
+
+
+
+
+    <div id="footer">
+        <ul>
+            <li v-for="(item,index) in footerInfo" @click="contentIndex = index" :class="{active : contentIndex == index}">
+                <p><i :class="[item.iconName,{reversal : index == 0}]" class="icon"></i></p>
+                <span v-text="item.text"></span>
+            </li>
+        </ul>
+    </div>
+</div>
+<script>
+    var app = new Vue({
+        name: 'HelloWorld',
+        el: '.hello',
+        data: {
+            msg: 'Welcome to Your Vue.js App',
+            title: '我的IM',
+            contentIndex: 0,
+            msgInfo:[
+                {
+                    name:'张三',
+                    img:'//tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg',
+                    msg:'嗨，欢迎体验LayIM。演示标记：1530843285035'
+                },
+                {
+                    name:'李四',
+                    img:'//tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg',
+                    msg:'嗨，欢迎体验LayIM。演示标记：1530843285035'
+                },
+                {
+                    name:'王五',
+                    img:'//tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg',
+                    msg:'嗨，欢迎体验LayIM。演示标记：1530843285035'
+                }
+            ],
+            footerInfo:[
+                {
+                    text:'消息',
+                    iconName:'ion-chatbubble-working'
+                },
+                {
+                    text:'联系人',
+                    iconName:'ion-android-person'
+                },
+                {
+                    text:'更多',
+                    iconName:'ion-android-compass'
+                }
+            ],
+            friendsHeader:[
+                {
+                    text:'新的朋友',
+                    iconName:'ion-plus-round'
+                },
+                {
+                    text:'群聊',
+                    iconName:'ion-android-people'
+                }
+            ],
+            friendsList:[
+                {
+                    cateName:'知名人物',
+                    show:false,
+                    num:'5',
+                    list:[
+                        {
+                            img:'//tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg',
+                            name:'张三',
+                            autograph:'这些都是测试数据，实际使用请严格按照该格式返回'
+                        },
+                        {
+                            img:'//tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg',
+                            name:'张三',
+                            autograph:'这些都是测试数据，实际使用请严格按照该格式返回'
+                        }
+                    ]
+                },
+                {
+                    cateName:'知名人物2',
+                    show:false,
+                    num:'15',
+                    list:[
+                        {
+                            img:'//tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg',
+                            name:'张三',
+                            autograph:'这些都是测试数据，实际使用请严格按照该格式返回'
+                        },
+                        {
+                            img:'//tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg',
+                            name:'张三',
+                            autograph:'这些都是测试数据，实际使用请严格按照该格式返回'
+                        }
+                    ]
+                },
+                {
+                    cateName:'知名人物3',
+                    show:false,
+                    num:'25',
+                    list:[
+                        {
+                            img:'//tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg',
+                            name:'张三',
+                            autograph:'这些都是测试数据，实际使用请严格按照该格式返回'
+                        },
+                        {
+                            img:'//tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg',
+                            name:'张三',
+                            autograph:'这些都是测试数据，实际使用请严格按照该格式返回'
+                        }
+                    ]
+                },
+                {
+                    cateName:'知名人物4',
+                    show:false,
+                    num:'25',
+                    list:[
+                        {
+                            img:'//tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg',
+                            name:'张三',
+                            autograph:'这些都是测试数据，实际使用请严格按照该格式返回'
+                        },
+                        {
+                            img:'//tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg',
+                            name:'张三',
+                            autograph:'这些都是测试数据，实际使用请严格按照该格式返回'
+                        }
+                    ]
+                }
+            ],
+            more:[
+                {
+                    icon:'ion-wrench',
+                    name:'设置'
+                },
+                {
+                    icon:'ion-android-share-alt',
+                    name:'分享'
+                },
+                {
+                    icon:'ion-ios-information-outline',
+                    name:'关于'
+                },
+            ]
+        },
+        methods:{
+            handleRouter(url,name){
+                router.push({path:'/'+url});
+            }
+        }
+
+    })
+</script>
+</body>
+</html>
