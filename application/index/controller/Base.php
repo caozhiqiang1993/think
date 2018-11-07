@@ -19,9 +19,9 @@ class Base extends Controller
     {
         $info = Request::instance()->header();
         if($info['authorization'] != 'undefined' && !empty($info['authorization'])){
-            if($info['authorization'] != input('post.user_id')){
+            /*if($info['authorization'] != input('post.user_id')){
                 die(ApiMessage::returnData(10000));
-            }
+            }*/
             $this->user_id = $info['authorization'];
         }else{
             die(ApiMessage::returnData(10000));

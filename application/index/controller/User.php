@@ -36,7 +36,7 @@ class User extends Base
         ApiMessage::setCodeData(1);
         $url = dealUploadImg('img');
         if($url){
-            model('User')->editUserInfo(['id'=>session('user_id')],['img'=>$url]);
+            model('User')->editUserInfo(['id'=>$this->user_id],['img'=>$url]);
             ApiMessage::setCodeData(0,$url);
         }
         return ApiMessage::returnData();
@@ -48,7 +48,7 @@ class User extends Base
      */
     public function editUserInfo(){
         $input = input('post.');
-        model('User')->editUserInfo(['id'=>session('user_id')],['explain'=>$input['explain']]);
+        model('User')->editUserInfo(['id'=>$this->user_id],['explain'=>$input['explain']]);
         return ApiMessage::returnData(0);
     }
 }

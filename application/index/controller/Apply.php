@@ -42,12 +42,13 @@ class Apply extends Base
         $applyModel = new ApplyList();
         $list = $applyModel->alias('a')
             ->join('__USERS__ u','a.f_user_id=u.id')
-            ->where(['a.user_id'=>session('user_id')])
+            ->join('__USERS__ ut','a.user_id=ut.id')
+            ->where('a.user_id = '.$this->user_id.' or f_user_id = '.$this->user_id)
             ->order('id desc')
-            ->field('a.id,a.status,a.memo,u.user_name,u.img')
+            ->field('a.id,a.status,a.memo,u.user_name,u.img,a.user_id fuid,ut.user_name ut_user_name,ut.img ut_img')
             ->select();
         $list = $list->toArray();
-        $w_count = $applyModel->where(['user_id'=>session('user_id'),'status'=>0])->count();
+        $w_count = $applyModel->where(['user_id'=>$this->user_id,'status'=>0])->count();
         $data = [
             'w_count' => $w_count,
             'list' => $list?$list:[]
