@@ -7,6 +7,7 @@
  */
 
 namespace app\index\controller;
+use GatewayClient\Gateway;
 
 
 
@@ -21,6 +22,9 @@ class Friend extends Base
         $user_id = $this->user_id;
         $fz = model('Friend')->getGrouping($user_id);
         $users = model('Friend')->getFriend($user_id);
+        foreach($users as $k=>$v){
+            $users[$k]['isOnline'] = Gateway::isUidOnline($v['user_id']);
+        }
 
         $users = array_column($users,null,'user_id');
         $users[$user_id]['grouping'] = $fz[0]['id'];

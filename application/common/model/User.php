@@ -16,4 +16,11 @@ class User extends Model
     public function editUserInfo($where = [],$data = []){
         return db('users')->where($where)->update($data);
     }
+
+    public function getMoreUserInfo($where = '',$field = ''){
+        return db('users')->where($where)->field($field)->select();
+    }
+    public function getOneUserInfo($where = '',$field = ''){
+        return db('users')->where($where)->field($field)->find();
+    }
 }

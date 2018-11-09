@@ -12,6 +12,8 @@ namespace app\index\controller;
 use think\cache\driver\Redis;
 use think\Controller;
 use think\Log;
+use GatewayClient\Gateway;
+use Redist\Redist;
 
 class Login extends Controller
 {
@@ -32,6 +34,18 @@ class Login extends Controller
                 return json($arr);
             }
         }
+
         return ApiMessage::returnData(0,$userInfo['id']);
+    }
+
+    public function test(){
+        $config = [
+            'host' => '127.0.0.1',
+            'port' => '6379',
+            'auth' => '123456',
+        ];
+        $redis = Redist::getInstance($config);
+        $redis->set('aa','22');
+        $a = $redis->get('aa');
     }
 }
