@@ -51,4 +51,6 @@ class User extends Base
         model('User')->editUserInfo(['id'=>$this->user_id],['explain'=>$input['explain']]);
         return ApiMessage::returnData(0);
     }
+
+
 }

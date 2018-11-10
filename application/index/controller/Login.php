@@ -22,20 +22,33 @@ class Login extends Controller
         ApiMessage::setCodeData(1);
         $userInfo = db('users')->where(['user_name'=>$input['username']])->find();
         if(empty($userInfo)){
-            $data = [
-                'user_name' =>$input['username'],
-                'password' =>md5($input['userpsd']),
-            ];
-            $userInfo['user_name'] = $input['username'];
-            $userInfo['id'] = db('users')->insertGetId($data);
-            db('friend_grouping')->insert(['user_id'=>$userInfo['id'],'name'=>'我的好友']);
+            ApiMessage::setCodeData(2);
         }else{
             if(md5($input['userpsd']) != $userInfo['password']){
-                return json($arr);
+                ApiMessage::setCodeData(2);
+            }else{
+                ApiMessage::setCodeData(0,$userInfo['id']);
             }
         }
 
-        return ApiMessage::returnData(0,$userInfo['id']);
+        return ApiMessage::returnData();
+    }
+
+    public function reg(){
+        $input = input('post.');
+        $userInfo = db('users')->where(['user_name'=>$input['username']])->find();
+        if($userInfo){
+            return ApiMessage::returnData(2);
+        }
+        $data = [
+            'user_name' =>$input['username'],
+            'password' =>md5($input['userpsd']),
+        ];
+        $userInfo['user_name'] = $input['username'];
+        $userInfo['id'] = db('users')->insertGetId($data);
+        db('friend_grouping')->insert(['user_id'=>$userInfo['id'],'name'=>'我的好友']);
+
+        return ApiMessage::returnData(0);
     }
 
     public function test(){
