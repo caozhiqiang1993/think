@@ -14,6 +14,7 @@ use think\Controller;
 use think\Log;
 use GatewayClient\Gateway;
 use Redist\Redist;
+use Firebase\JWT\JWT;
 
 class Login extends Controller
 {
@@ -27,7 +28,16 @@ class Login extends Controller
             if(md5($input['userpsd']) != $userInfo['password']){
                 ApiMessage::setCodeData(2);
             }else{
-                ApiMessage::setCodeData(0,$userInfo['id']);
+                //获取token
+                $key = model('common/JwtModel')->getKey([
+                    'user_id' => $userInfo['id'],
+                    'user_name' => $userInfo['user_name']
+                ]);
+                $data = [
+                    'uid' => $userInfo['id'],
+                    'key' => $key,
+                ];
+                ApiMessage::setCodeData(0,$data);
             }
         }
 
@@ -48,7 +58,16 @@ class Login extends Controller
         $userInfo['id'] = db('users')->insertGetId($data);
         db('friend_grouping')->insert(['user_id'=>$userInfo['id'],'name'=>'我的好友']);
 
-        return ApiMessage::returnData(0);
+        //获取token
+        $key = model('common/JwtModel')->getKey([
+            'user_id' => $userInfo['id'],
+            'user_name' => $userInfo['user_name']
+        ]);
+        $data = [
+            'uid' => $userInfo['id'],
+            'key' => $key,
+        ];
+        return ApiMessage::returnData(0,$data);
     }
 
     public function test(){

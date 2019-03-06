@@ -11,13 +11,11 @@
 
 // [ 应用入口文件 ]
 
-header("Access-Control-Allow-Origin: *");
+/*header("Access-Control-Allow-Origin: *");
 header('Access-Control-Allow-Headers:x-requested-with,content-type,USER_ID,TOKEN,Authorization');
 header("Access-Control-Allow-Methods:HEAD, GET, POST, DELETE, PUT, OPTIONS");
-header("Access-Control-Allow-Credentials:true");
-if (strtolower($_SERVER['REQUEST_METHOD']) == 'options') {
-    exit;
-}
+header("Access-Control-Allow-Credentials:true");*/
+
 // 定义应用目录
 define('APP_PATH', __DIR__ . '/application/');
 define('CONF_PATH', __DIR__.'/config/');
